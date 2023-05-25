@@ -2,6 +2,8 @@
 """Log message obfuscating module"""
 
 import re
+import os
+import mysql.connector
 from typing import List
 import logging
 
@@ -17,6 +19,19 @@ def get_logger() -> logging.Logger:
     stream_handler.setFormatter(RedactingFormatter(PII_FIELDS))
     logger.addHandler(stream_handler)
     return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """Creates a database connector and
+    returns the connection object
+    """
+    mydb = mysql.connector.connect(
+            host=os.environ.get('PERSONAL_DATA_DB_HOST'),
+            user=os.environ.get('PERSONAL_DATA_DB_USERNAME'),
+            password=os.environ.get('PERSONAL_DATA_DB_PASSWORD'),
+            database=os.environ.get('PERSONAL_DATA_DB_NAME')
+    )
+    return mydb
 
 
 def filter_datum(fields: List[str], redaction: str,
