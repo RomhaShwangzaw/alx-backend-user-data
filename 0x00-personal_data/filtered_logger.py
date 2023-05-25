@@ -47,7 +47,7 @@ def main() -> None:
             lambda x: "{}={}".format(x[0], x[1]),
             zip(columns, row)
         )
-        msg = "{};".format(";".join(list(record)))
+        msg = "{};".format("; ".join(list(record)))
         log_record = logging.LogRecord("user_data", logging.INFO, None,
                                        None, msg, None, None)
         formatter = RedactingFormatter(fields=("name", "email",
