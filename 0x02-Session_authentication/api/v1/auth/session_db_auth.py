@@ -3,6 +3,7 @@
 """
 from api.v1.auth.session_exp_auth import SessionExpAuth
 from models.user_session import UserSession
+from datetime import datetime, timedelta
 
 
 class SessionDBAuth(SessionExpAuth):
@@ -29,9 +30,6 @@ class SessionDBAuth(SessionExpAuth):
           - None if `session_id` is not a string
           - Otherwise, return `user_id` from the UserSession instance
         """
-        user_id = super().user_id_for_session_id(session_id)
-        if not user_id:
-            return None
         try:
             user_sessions = UserSession.search({'session_id': session_id})
         except Exception:
@@ -39,6 +37,12 @@ class SessionDBAuth(SessionExpAuth):
         if len(user_sessions) == 0:
             return None
         user_session = user_sessions[0]
+        created_at = user_session.created_at
+        if not created_at:
+            return None
+        if created_at + timedelta(
+                seconds=self.session_duration) < datetime.now():
+            return None
         return user_session.user_id
 
     def destroy_session(self, request=None):
