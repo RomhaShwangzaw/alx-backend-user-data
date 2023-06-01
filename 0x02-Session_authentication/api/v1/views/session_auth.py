@@ -11,7 +11,7 @@ from os import getenv
 def login() -> str:
     """ POST /api/v1/auth_session/login
     Return:
-      - list of all User objects JSON represented
+      - a user instance
     """
     email = request.form.get("email")
     password = request.form.get("password")
@@ -33,5 +33,5 @@ def login() -> str:
     from api.v1.app import auth
     session_id = auth.create_session(user.id)
     response = jsonify(user.to_json())
-    response.set_cookie("{}={}".format(getenv("SESSION_NAME"), session_id))
+    response.set_cookie(getenv("SESSION_NAME"), session_id)
     return response
