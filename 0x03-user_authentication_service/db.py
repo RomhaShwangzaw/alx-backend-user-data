@@ -57,6 +57,6 @@ class DB:
         user = self.find_user_by(id=user_id)
         for attr, val in kwargs.items():
             if attr not in VALID_FIELDS:
-                raise TypeError
+                raise ValueError
             setattr(user, attr, val)
         self._session.commit()
