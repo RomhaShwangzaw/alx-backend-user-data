@@ -7,6 +7,10 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from user import Base, User
+from typing import Dict
+
+VALID_FIELDS = ['id', 'email', 'hashed_password',
+                'session_id', 'reset_token']
 
 
 class DB:
@@ -38,11 +42,21 @@ class DB:
         self._session.commit()
         return user
 
-    def find_user_by(self, **args: str) -> User:
+    def find_user_by(self, **kwargs: Dict) -> User:
         """ Finds a user from the database based on the
-        filters supplied as keyword arguments `args`
+        filters supplied as keyword arguments `kwargs`
         """
-        result = self._session.query(User).filter_by(**args).first()
+        result = self._session.query(User).filter_by(**kwargs).first()
         if not result:
-            raise NoResultFound()
+            raise NoResultFound
         return result
+
+    def update_user(self, user_id: int, **kwargs: Dict) -> None:
+        """ Updates a user's attributes on the database
+        """
+        user = self.find_user_by(id=user_id)
+        for attr, val in kwargs.items():
+            if attr not in VALID_FIELDS:
+                raise TypeError
+            setattr(user, attr, val)
+        self._session.commit()
