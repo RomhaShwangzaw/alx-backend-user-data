@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from user import Base, User
 
@@ -36,3 +37,12 @@ class DB:
         self._session.add(user)
         self._session.commit()
         return user
+
+    def find_user_by(self, **args: str) -> User:
+        """ Finds a user from the database based on the
+        filters supplied as keyword arguments `args`
+        """
+        result = self._session.query(User).filter_by(**args).first()
+        if not result:
+            raise NoResultFound()
+        return result
