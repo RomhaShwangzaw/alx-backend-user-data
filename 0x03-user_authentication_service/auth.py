@@ -65,10 +65,21 @@ class Auth:
             return None
         try:
             return self._db.find_user_by(session_id=session_id)
-        except Exception:
+        except NoResultFound:
             return None
 
     def destroy_session(self, user_id: int) -> None:
         """ Destroys a user Session
         """
         self._db.update_user(user_id, session_id=None)
+
+    def get_reset_password_token(self, email: str) -> str:
+        """ Updates the user’s `reset_token` database field
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+            token = _generate_uuid()
+            self._db.update_user(user.id, reset_token=token)
+            return token
+        except NoResultFound:
+            raise ValueError
