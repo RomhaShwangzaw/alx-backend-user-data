@@ -8,7 +8,7 @@ from user import User
 from sqlalchemy.orm.exc import NoResultFound
 
 
-def _hash_password(password: str) -> bytes:
+def _hash_password(password: str) -> str:
     """ Hashes a password and returns the salted hash of the password
     """
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
